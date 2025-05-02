@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Прогресс</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор прогресса</h1>
+        <h1>Боевой пропуск 16 сезон</h1>
+        <div class="info-block">
+            <p>с 5 марта по 3 июня.</p>
+            <p>укажите главу, какую по счету уже выполняете и этап, количество полученных очков в этапе и нажмите рассчитать.</p>
+        </div>
+        
+        <form id="progress-form">
+            <div class="form-group form-group-chapter">
+                <label for="chapter">Глава (1-3):</label>
+                <input type="number" id="chapter" min="1" max="3" required>
+            </div>
+            
+            <div class="form-group form-group-stage">
+                <label for="stage">Этап (1-50):</label>
+                <input type="number" id="stage" min="1" max="50" required>
+            </div>
+            
+            <div class="form-group form-group-points">
+                <label for="points-numerator">Количество очков в этапе:</label>
+                <div class="fraction-input">
+                    <input type="number" id="points-numerator" min="0" max="7500" required>
+                    <span class="fraction-divider">/</span>
+                    <span class="fraction-denominator">50</span>
+                </div>
+            </div>
+            
+            <button type="submit">Рассчитать</button>
+        </form>
+        
+        <div id="result" class="result-block"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html> 
