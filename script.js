@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validate inputs
         if (isNaN(chapter) || isNaN(stage) || isNaN(pointsNumerator)) {
-            showResult('Пожалуйста, заполните все поля корректно');
+            showResult('Будь ласка, заповніть всі поля коректно');
             return;
         }
 
@@ -39,12 +39,12 @@ document.addEventListener('DOMContentLoaded', function() {
         today.setHours(0, 0, 0, 0);
 
         if (today < START_DATE) {
-            showResult(`Событие ещё не началось. Старт 5 июня ${START_DATE.getFullYear()} года.`);
+            showResult(`Подія ще не почалася. Старт 5 червня ${START_DATE.getFullYear()} року.`);
             return;
         }
 
         if (today > END_DATE) {
-            showResult(`Событие уже завершилось 2 сентября ${END_DATE.getFullYear()} года.`);
+            showResult(`Подія вже завершилася 2 вересня ${END_DATE.getFullYear()} року.`);
             return;
         }
 
@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const pointsPerDay = Math.ceil(remainingPoints / daysRemaining);
 
         const progressStatus = completedPoints >= expectedPoints 
-            ? `Вы опережаете график на ${completedPoints - expectedPoints} очков` 
-            : `Вы отстаете от графика на ${expectedPoints - completedPoints} очков`;
+            ? `Ви випереджаєте графік на ${completedPoints - expectedPoints} очок` 
+            : `Ви відстали від графіку на ${expectedPoints - completedPoints} очок`;
         const progressClass = completedPoints >= expectedPoints ? 'highlight' : 'highlight-warning';
 
         displayResults(today, completedPoints, remainingPoints, daysRemaining, pointsPerDay, 
@@ -88,17 +88,17 @@ document.addEventListener('DOMContentLoaded', function() {
         chapter, stage, globalStageNumber, averagePointsPerDay, progressStatus, progressClass,
         expectedChapter, expectedStage, expectedStagePoints) {
         const resultHTML = `
-            <h3>Результаты расчёта:</h3>
-            <p>Текущая дата: ${formatDate(today)}</p>
-            <p>Конечная дата: ${formatDate(END_DATE)}</p>
-            <p>Осталось дней: <span class="highlight">${daysRemaining}</span></p>
-            <p>Текущая глава: <span class="highlight">${chapter}</span>, этап: <span class="highlight">${stage}</span> (общий этап: ${globalStageNumber})</p>
-            <p>Всего очков получено: <span class="highlight">${completedPoints}</span> из ${TOTAL_POINTS}</p>
-            <p>Очков осталось: <span class="highlight">${remainingPoints}</span></p>
-            <p>Среднее количество очков в день за весь период: <span class="highlight">${averagePointsPerDay}</span></p>
-            <p>Сегодня вы должны быть на: глава <span class="highlight">${expectedChapter}</span>, этап <span class="highlight">${expectedStage}</span>, с ${expectedStagePoints} очками в этапе</p>
-            <p>Текущий прогресс: <span class="${progressClass}">${progressStatus}</span></p>
-            <p>Чтобы успеть набрать необходимое количество очков, вам нужно зарабатывать <span class="highlight">${pointsPerDay}</span> очков в день.</p>
+            <h3>Результати розрахунку:</h3>
+            <p>Поточна дата: ${formatDate(today)}</p>
+            <p>Кінцева дата: ${formatDate(END_DATE)}</p>
+            <p>Залишилося днів: <span class="highlight">${daysRemaining}</span></p>
+            <p>Поточна глава: <span class="highlight">${chapter}</span>, етап: <span class="highlight">${stage}</span> (загальний етап: ${globalStageNumber})</p>
+            <p>Всього очок отримано: <span class="highlight">${completedPoints}</span> з ${TOTAL_POINTS}</p>
+            <p>Очок залишилось: <span class="highlight">${remainingPoints}</span></p>
+            <p>Середня кількість очок в день за весь період: <span class="highlight">${averagePointsPerDay}</span></p>
+            <p>Сьогодні ви повинні бути на: глава <span class="highlight">${expectedChapter}</span>, етап <span class="highlight">${expectedStage}</span>, з <span class="highlight">${expectedStagePoints}</span> очками в етапі</p>
+            <p>Поточний прогрес: <span class="${progressClass}">${progressStatus}</span></p>
+            <p>Щоб встигнути набрати необхідну кількість очок, вам необхідно набирати <span class="highlight">${pointsPerDay}</span> очок в день.</p>
         `;
         showResult(resultHTML);
     }
@@ -110,6 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function formatDate(date) {
         const options = { day: 'numeric', month: 'long', year: 'numeric' };
-        return date.toLocaleDateString('ru-RU', options);
+        return date.toLocaleDateString('uk-UA', options);
     }
 });
