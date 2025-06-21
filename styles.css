@@ -154,3 +154,8 @@ button:hover {
     font-weight: bold;
     color: #e74c3c;
 }
+
+.highlight-warning {
+    color: #ff4444;
+    font-weight: bold;
+}
