@@ -104,48 +104,54 @@ document.addEventListener('DOMContentLoaded', function() {
             <p>Поточний прогрес: <span class="${progressClass}">${progressStatus}</span></p>
             <p>Щоб встигнути набрати необхідну кількість очок, вам необхідно набирати <span class="highlight">${pointsPerDay}</span> очок в день.</p>
 
-            <div class="email-form">
-                <h3>Відправити результати на e-mail:</h3>
-                <div class="form-group">
-                    <input type="email" id="email-input" placeholder="Введіть ваш e-mail" required>
-                    <button type="button" id="send-email-btn">Відправити</button>
-                </div>
+            <div class="actions-form">
+                <button type="button" id="copy-btn" class="action-btn">Копіювати результати</button>
+                <span id="copy-status" class="copy-status"></span>
             </div>
         `;
         showResult(resultHTML);
+        
+        // Add copy button handler
+        const copyBtn = document.getElementById('copy-btn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                const text = formatResultsForCopy(today, completedPoints, remainingPoints, 
+                    daysRemaining, pointsPerDay, chapter, stage, progressStatus);
+                copyToClipboard(text);
+            });
+        }
+    }
+
+    function formatResultsForCopy(today, completedPoints, remainingPoints, daysRemaining, 
+        pointsPerDay, chapter, stage, progressStatus) {
+        return `Результати розрахунку на ${formatDate(today)}:
+
+Поточна глава: ${chapter}, етап: ${stage}
+Всього очок отримано: ${completedPoints}
+Очок залишилось: ${remainingPoints}
+Залишилося днів: ${daysRemaining}
+${progressStatus}
+Необхідно набирати ${pointsPerDay} очок в день`;
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            const statusEl = document.getElementById('copy-status');
+            statusEl.textContent = 'Скопійовано!';
+            statusEl.style.opacity = '1';
+            
+            setTimeout(() => {
+                statusEl.style.opacity = '0';
+            }, 2000);
+        }).catch(err => {
+            console.error('Помилка копіювання:', err);
+            alert('Не вдалося скопіювати текст');
+        });
     }
 
     function showResult(html) {
         resultBlock.innerHTML = html;
         resultBlock.classList.add('active');
-
-        // Add event listener for email button
-        const sendEmailBtn = document.getElementById('send-email-btn');
-        if (sendEmailBtn) {
-            sendEmailBtn.addEventListener('click', sendResultsByEmail);
-        }
-    }
-
-    function sendResultsByEmail() {
-        const emailInput = document.getElementById('email-input');
-        if (!emailInput || !emailInput.value || !emailInput.checkValidity()) {
-            alert('Будь ласка, введіть коректний e-mail');
-            return;
-        }
-
-        // Get the results text (excluding the email form)
-        const resultText = Array.from(resultBlock.querySelectorAll('p'))
-            .map(p => p.textContent.trim())
-            .join('\n');
-
-        const subject = 'Результати розрахунку прогресу Бойової перепустки';
-        const body = `Результати розрахунку:\n\n${resultText}`;
-
-        // Create mailto link
-        const mailtoLink = `mailto:${emailInput.value}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-        // Open email client
-        window.location.href = mailtoLink;
     }
 
     function formatDate(date) {
