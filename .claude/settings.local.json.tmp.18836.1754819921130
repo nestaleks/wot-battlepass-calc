@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(node:*)",
+      "Bash(npx http-server:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": []
+  }
+}

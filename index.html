@@ -19,9 +19,21 @@
     <div class="container">
         <h1>Калькулятор прогресу</h1>
         <h1>Бойова перепустка 17 сезон</h1>
+        <div class="mode-selector">
+            <h3>Оберіть режим:</h3>
+            <label class="mode-option">
+                <input type="radio" name="mode" value="original" checked>
+                <span>Оригінальний (3 главы, 4 червня - 2 вересня)</span>
+            </label>
+            <label class="mode-option">
+                <input type="radio" name="mode" value="alternative">
+                <span>Альтернативний (1 глава, 8 серпня - 31 серпня)</span>
+            </label>
+        </div>
+
         <div class="info-block">
-            <p>з 4 червня до 2 вересня</p>
-            <p>Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.</p>
+            <p id="info-period">з 4 червня до 2 вересня</p>
+            <p id="info-description">Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.</p>
         </div>
         
         <form id="progress-form">

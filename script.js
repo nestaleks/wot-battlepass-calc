@@ -1,37 +1,106 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Populate stages dropdown
-    const stageSelect = document.getElementById('stage');
-    for(let i = 1; i <= 50; i++) {
-        const option = document.createElement('option');
-        option.value = i;
-        option.textContent = i;
-        stageSelect.appendChild(option);
-    }
+    // Mode configurations
+    const MODES = {
+        original: {
+            TOTAL_POINTS: 7500,
+            POINTS_PER_STAGE: 50,
+            STAGES_PER_CHAPTER: 50,
+            POINTS_PER_CHAPTER: 2500,
+            CHAPTERS_TOTAL: 3,
+            START_DATE: new Date(2025, 5, 4), // June 4th, 2025
+            END_DATE: new Date(2025, 8, 2),   // September 2nd, 2025
+            periodText: "з 4 червня до 2 вересня",
+            descriptionText: "Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.",
+            maxChapters: 3
+        },
+        alternative: {
+            TOTAL_POINTS: 2500,
+            POINTS_PER_STAGE: 50,
+            STAGES_PER_CHAPTER: 50,
+            POINTS_PER_CHAPTER: 2500,
+            CHAPTERS_TOTAL: 1,
+            START_DATE: new Date(2025, 7, 8), // August 8th, 2025
+            END_DATE: new Date(2025, 7, 31),  // August 31st, 2025
+            periodText: "з 8 серпня до 31 серпня",
+            descriptionText: "Вкажіть етап та кількість отриманих очок в етапі і нажмите кнопку.",
+            maxChapters: 1
+        }
+    };
 
-    // Constants
-    const TOTAL_POINTS = 7500;
-    const POINTS_PER_STAGE = 50;
-    const STAGES_PER_CHAPTER = 50;
-    const POINTS_PER_CHAPTER = 2500;
-    const CHAPTERS_TOTAL = 3;
-    const START_DATE = new Date(new Date().getFullYear(), 5, 5); // June 5th (months are 0-based)
-    const END_DATE = new Date(new Date().getFullYear(), 8, 2);   // September 2nd
+    let currentMode = 'original';
 
     const form = document.getElementById('progress-form');
     const resultBlock = document.getElementById('result');
 
+    // Initialize mode switching
+    initializeModes();
+
     form.addEventListener('submit', calculateProgress);
     loadHistory(); // Add this line
+
+    function initializeModes() {
+        const modeRadios = document.querySelectorAll('input[name="mode"]');
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', handleModeChange);
+        });
+        
+        // Set initial mode UI
+        updateModeUI();
+    }
+
+    function handleModeChange(event) {
+        currentMode = event.target.value;
+        updateModeUI();
+        clearResults();
+    }
+
+    function updateModeUI() {
+        const config = getCurrentConfig();
+        
+        // Update info texts
+        document.getElementById('info-period').textContent = config.periodText;
+        document.getElementById('info-description').textContent = config.descriptionText;
+        
+        // Update chapter input
+        const chapterInput = document.getElementById('chapter');
+        const chapterLabel = document.querySelector('label[for="chapter"]');
+        
+        if (currentMode === 'alternative') {
+            chapterInput.style.display = 'none';
+            chapterLabel.style.display = 'none';
+            chapterInput.parentElement.style.display = 'none';
+            chapterInput.removeAttribute('required');
+            chapterInput.value = '1'; // Set default value for calculations
+        } else {
+            chapterInput.style.display = '';
+            chapterLabel.style.display = '';
+            chapterInput.parentElement.style.display = '';
+            chapterInput.setAttribute('required', 'required');
+            chapterInput.max = config.maxChapters;
+            chapterLabel.textContent = `Глава (1-${config.maxChapters}):`;
+        }
+    }
+
+    function getCurrentConfig() {
+        return MODES[currentMode];
+    }
+
+    function clearResults() {
+        resultBlock.innerHTML = '';
+        resultBlock.classList.remove('active');
+    }
 
     function calculateProgress(e) {
         e.preventDefault();
 
-        const chapter = parseInt(document.getElementById('chapter').value);
+        const config = getCurrentConfig();
+        const chapter = currentMode === 'alternative' ? 1 : parseInt(document.getElementById('chapter').value);
         const stage = parseInt(document.getElementById('stage').value);
         const pointsNumerator = parseInt(document.getElementById('points-numerator').value);
 
         // Validate inputs
-        if (isNaN(chapter) || isNaN(stage) || isNaN(pointsNumerator)) {
+        const chapterValid = currentMode === 'alternative' || !isNaN(chapter);
+        if (!chapterValid || isNaN(stage) || isNaN(pointsNumerator)) {
             showResult('Будь ласка, заповніть всі поля коректно');
             return;
         }
@@ -39,30 +108,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        if (today < START_DATE) {
-            showResult(`Подія ще не почалася. Старт 5 червня ${START_DATE.getFullYear()} року.`);
+        if (today < config.START_DATE) {
+            const startDateText = currentMode === 'original' ? '4 червня' : '8 серпня';
+            showResult(`Подія ще не почалася. Старт ${startDateText} ${config.START_DATE.getFullYear()} року.`);
             return;
         }
 
-        if (today > END_DATE) {
-            showResult(`Подія вже завершилася 2 вересня ${END_DATE.getFullYear()} року.`);
+        if (today > config.END_DATE) {
+            const endDateText = currentMode === 'original' ? '2 вересня' : '31 серпня';
+            showResult(`Подія вже завершилася ${endDateText} ${config.END_DATE.getFullYear()} року.`);
             return;
         }
 
-        const totalDays = Math.ceil((END_DATE - START_DATE) / (1000 * 60 * 60 * 24));
-        const averagePointsPerDay = Math.ceil(TOTAL_POINTS / totalDays);
+        const totalDays = Math.ceil((config.END_DATE - config.START_DATE) / (1000 * 60 * 60 * 24));
+        const averagePointsPerDay = Math.ceil(config.TOTAL_POINTS / totalDays);
 
-        const daysPassed = Math.ceil((today - START_DATE) / (1000 * 60 * 60 * 24));
+        const daysPassed = Math.ceil((today - config.START_DATE) / (1000 * 60 * 60 * 24));
         const expectedPoints = Math.ceil(averagePointsPerDay * daysPassed);
-        const expectedChapter = Math.ceil(expectedPoints / POINTS_PER_CHAPTER);
-        const pointsInCurrentExpectedChapter = expectedPoints % POINTS_PER_CHAPTER;
-        const expectedStage = Math.ceil(pointsInCurrentExpectedChapter / POINTS_PER_STAGE);
-        const expectedStagePoints = pointsInCurrentExpectedChapter % POINTS_PER_STAGE;
+        const expectedChapter = currentMode === 'alternative' ? 1 : Math.ceil(expectedPoints / config.POINTS_PER_CHAPTER);
+        const pointsInCurrentExpectedChapter = currentMode === 'alternative' ? expectedPoints : expectedPoints % config.POINTS_PER_CHAPTER;
+        const expectedStage = Math.ceil(pointsInCurrentExpectedChapter / config.POINTS_PER_STAGE);
+        const expectedStagePoints = pointsInCurrentExpectedChapter % config.POINTS_PER_STAGE;
 
-        const globalStageNumber = ((chapter - 1) * STAGES_PER_CHAPTER) + stage;
-        let completedPoints = calculateCompletedPoints(chapter, stage, pointsNumerator);
-        const remainingPoints = TOTAL_POINTS - completedPoints;
-        const daysRemaining = Math.ceil((END_DATE - today) / (1000 * 60 * 60 * 24));
+        const globalStageNumber = currentMode === 'alternative' ? stage : ((chapter - 1) * config.STAGES_PER_CHAPTER) + stage;
+        let completedPoints = calculateCompletedPoints(chapter, stage, pointsNumerator, config);
+        const remainingPoints = config.TOTAL_POINTS - completedPoints;
+        const daysRemaining = Math.ceil((config.END_DATE - today) / (1000 * 60 * 60 * 24));
         const pointsPerDay = Math.ceil(remainingPoints / daysRemaining);
 
         const progressStatus = completedPoints >= expectedPoints 
@@ -75,32 +146,41 @@ document.addEventListener('DOMContentLoaded', function() {
 
         displayResults(today, completedPoints, remainingPoints, daysRemaining, pointsPerDay, 
             chapter, stage, globalStageNumber, averagePointsPerDay, progressStatus, progressClass,
-            expectedChapter, expectedStage, expectedStagePoints);
+            expectedChapter, expectedStage, expectedStagePoints, config);
     }
 
-    function calculateCompletedPoints(chapter, stage, pointsNumerator) {
+    function calculateCompletedPoints(chapter, stage, pointsNumerator, config) {
         let points = 0;
-        if (chapter > 1) {
-            points += POINTS_PER_CHAPTER * (chapter - 1);
+        if (currentMode === 'original' && chapter > 1) {
+            points += config.POINTS_PER_CHAPTER * (chapter - 1);
         }
-        points += (stage - 1) * POINTS_PER_STAGE;
+        points += (stage - 1) * config.POINTS_PER_STAGE;
         points += pointsNumerator;
         return points;
     }
 
     function displayResults(today, completedPoints, remainingPoints, daysRemaining, pointsPerDay, 
         chapter, stage, globalStageNumber, averagePointsPerDay, progressStatus, progressClass,
-        expectedChapter, expectedStage, expectedStagePoints) {
+        expectedChapter, expectedStage, expectedStagePoints, config) {
+        
+        const chapterInfo = currentMode === 'alternative' ? 
+            `<p>Поточний етап: <span class="highlight">${stage}</span></p>` :
+            `<p>Поточна глава: <span class="highlight">${chapter}</span>, етап: <span class="highlight">${stage}</span> (загальний етап: ${globalStageNumber})</p>`;
+        
+        const expectedInfo = currentMode === 'alternative' ?
+            `<p>Сьогодні ви повинні бути на: етап <span class="highlight">${expectedStage}</span>, з <span class="highlight">${expectedStagePoints}</span> очками в етапі</p>` :
+            `<p>Сьогодні ви повинні бути на: глава <span class="highlight">${expectedChapter}</span>, етап <span class="highlight">${expectedStage}</span>, з <span class="highlight">${expectedStagePoints}</span> очками в етапі</p>`;
+
         const resultHTML = `
             <h3>Результати розрахунку:</h3>
             <p>Поточна дата: ${formatDate(today)}</p>
-            <p>Кінцева дата: ${formatDate(END_DATE)}</p>
+            <p>Кінцева дата: ${formatDate(config.END_DATE)}</p>
             <p>Залишилося днів: <span class="highlight">${daysRemaining}</span></p>
-            <p>Поточна глава: <span class="highlight">${chapter}</span>, етап: <span class="highlight">${stage}</span> (загальний етап: ${globalStageNumber})</p>
-            <p>Всього очок отримано: <span class="highlight">${completedPoints}</span> з ${TOTAL_POINTS}</p>
+            ${chapterInfo}
+            <p>Всього очок отримано: <span class="highlight">${completedPoints}</span> з ${config.TOTAL_POINTS}</p>
             <p>Очок залишилось: <span class="highlight">${remainingPoints}</span></p>
             <p>Середня кількість очок в день за весь період: <span class="highlight">${averagePointsPerDay}</span></p>
-            <p>Сьогодні ви повинні бути на: глава <span class="highlight">${expectedChapter}</span>, етап <span class="highlight">${expectedStage}</span>, з <span class="highlight">${expectedStagePoints}</span> очками в етапі</p>
+            ${expectedInfo}
             <p>Поточний прогрес: <span class="${progressClass}">${progressStatus}</span></p>
             <p>Щоб встигнути набрати необхідну кількість очок, вам необхідно набирати <span class="highlight">${pointsPerDay}</span> очок в день.</p>
 
@@ -124,9 +204,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function formatResultsForCopy(today, completedPoints, remainingPoints, daysRemaining, 
         pointsPerDay, chapter, stage, progressStatus) {
+        const chapterText = currentMode === 'alternative' ? 
+            `Поточний етап: ${stage}` :
+            `Поточна глава: ${chapter}, етап: ${stage}`;
+
         return `Результати розрахунку на ${formatDate(today)}:
 
-Поточна глава: ${chapter}, етап: ${stage}
+${chapterText}
 Всього очок отримано: ${completedPoints}
 Очок залишилось: ${remainingPoints}
 Залишилося днів: ${daysRemaining}
