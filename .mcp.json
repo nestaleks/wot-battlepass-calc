@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "ultrathink": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "ultrathink"
+      ],
+      "env": {}
+    },
+    "figma-developer": {
+      "command": "npx",
+      "args": [
+        "figma-developer-mcp"
+      ],
+      "env": {}
+    },
+    "sequential-thinking": {
+      "command": "node",
+      "args": [
+        "F:\\home\\nestaleks\\.npm-global\\node_modules\\@modelcontextprotocol\\server-sequential-thinking\\dist\\index.js"
+      ],
+      "env": {}
+    },
+    "jetbrains": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@jetbrains/mcp-proxy"
+      ],
+      "env": {}
+    }
+  }
+}

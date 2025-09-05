@@ -4,7 +4,15 @@
       "Bash(python:*)",
       "Bash(node:*)",
       "Bash(npx http-server:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(powershell:*)",
+      "Bash(claude config get)",
+      "Bash(claude config path)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(move claude.json .mcp.json)",
+      "Bash(npm install:*)",
+      "Bash(where:*)",
+      "Bash(dir:*)"
     ],
     "deny": []
   }

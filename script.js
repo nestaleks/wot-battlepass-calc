@@ -1,77 +1,44 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Mode configurations
-    const MODES = {
-        original: {
-            TOTAL_POINTS: 7500,
-            POINTS_PER_STAGE: 50,
-            STAGES_PER_CHAPTER: 50,
-            POINTS_PER_CHAPTER: 2500,
-            CHAPTERS_TOTAL: 3,
-            START_DATE: new Date(2025, 5, 4), // June 4th, 2025
-            END_DATE: new Date(2025, 8, 2),   // September 2nd, 2025
-            periodText: "з 4 червня до 2 вересня",
-            descriptionText: "Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.",
-            maxChapters: 3
-        },
-        alternative: {
-            TOTAL_POINTS: 2500,
-            POINTS_PER_STAGE: 50,
-            STAGES_PER_CHAPTER: 50,
-            POINTS_PER_CHAPTER: 2500,
-            CHAPTERS_TOTAL: 1,
-            START_DATE: new Date(2025, 7, 8), // August 8th, 2025
-            END_DATE: new Date(2025, 7, 31),  // August 31st, 2025
-            periodText: "з 8 серпня до 31 серпня",
-            descriptionText: "Вкажіть етап та кількість отриманих очок в етапі і нажмите кнопку.",
-            maxChapters: 1
-        }
+    const CONFIG = {
+        TOTAL_POINTS: 7500,
+        POINTS_PER_STAGE: 50,
+        STAGES_PER_CHAPTER: 50,
+        POINTS_PER_CHAPTER: 2500,
+        CHAPTERS_TOTAL: 3,
+        START_DATE: new Date(2025, 8, 3), // September 3rd, 2025
+        END_DATE: new Date(2025, 10, 25), // November 25th, 2025
+        periodText: "з 3 вересня до 25 листопада",
+        descriptionText: "Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.",
+        maxChapters: 3
     };
 
-    let currentMode = 'original';
+    // Single mode (original) only
 
     const form = document.getElementById('progress-form');
     const resultBlock = document.getElementById('result');
 
-    // Initialize mode switching
-    initializeModes();
+    // Initialize fixed config UI
+    updateModeUI();
 
     form.addEventListener('submit', calculateProgress);
     loadHistory(); // Add this line
 
-    function initializeModes() {
-        const modeRadios = document.querySelectorAll('input[name="mode"]');
-        modeRadios.forEach(radio => {
-            radio.addEventListener('change', handleModeChange);
-        });
-        
-        // Set initial mode UI
-        updateModeUI();
-    }
-
-    function handleModeChange(event) {
-        currentMode = event.target.value;
-        updateModeUI();
-        clearResults();
-    }
+    // Removed alternative mode; only single configuration remains
 
     function updateModeUI() {
         const config = getCurrentConfig();
         
         // Update info texts
-        document.getElementById('info-period').textContent = config.periodText;
-        document.getElementById('info-description').textContent = config.descriptionText;
+        const periodEl = document.getElementById('info-period');
+        if (periodEl) periodEl.textContent = config.periodText;
+        const descEl = document.getElementById('info-description');
+        if (descEl) descEl.textContent = config.descriptionText;
         
         // Update chapter input
         const chapterInput = document.getElementById('chapter');
         const chapterLabel = document.querySelector('label[for="chapter"]');
-        
-        if (currentMode === 'alternative') {
-            chapterInput.style.display = 'none';
-            chapterLabel.style.display = 'none';
-            chapterInput.parentElement.style.display = 'none';
-            chapterInput.removeAttribute('required');
-            chapterInput.value = '1'; // Set default value for calculations
-        } else {
+        if (chapterInput && chapterLabel) {
             chapterInput.style.display = '';
             chapterLabel.style.display = '';
             chapterInput.parentElement.style.display = '';
@@ -82,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getCurrentConfig() {
-        return MODES[currentMode];
+        return CONFIG;
     }
 
     function clearResults() {
@@ -94,12 +61,12 @@ document.addEventListener('DOMContentLoaded', function() {
         e.preventDefault();
 
         const config = getCurrentConfig();
-        const chapter = currentMode === 'alternative' ? 1 : parseInt(document.getElementById('chapter').value);
+        const chapter = parseInt(document.getElementById('chapter').value);
         const stage = parseInt(document.getElementById('stage').value);
         const pointsNumerator = parseInt(document.getElementById('points-numerator').value);
 
         // Validate inputs
-        const chapterValid = currentMode === 'alternative' || !isNaN(chapter);
+        const chapterValid = !isNaN(chapter);
         if (!chapterValid || isNaN(stage) || isNaN(pointsNumerator)) {
             showResult('Будь ласка, заповніть всі поля коректно');
             return;
@@ -109,13 +76,13 @@ document.addEventListener('DOMContentLoaded', function() {
         today.setHours(0, 0, 0, 0);
 
         if (today < config.START_DATE) {
-            const startDateText = currentMode === 'original' ? '4 червня' : '8 серпня';
+            const startDateText = '3 вересня';
             showResult(`Подія ще не почалася. Старт ${startDateText} ${config.START_DATE.getFullYear()} року.`);
             return;
         }
 
         if (today > config.END_DATE) {
-            const endDateText = currentMode === 'original' ? '2 вересня' : '31 серпня';
+            const endDateText = '25 листопада';
             showResult(`Подія вже завершилася ${endDateText} ${config.END_DATE.getFullYear()} року.`);
             return;
         }
@@ -125,12 +92,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const daysPassed = Math.ceil((today - config.START_DATE) / (1000 * 60 * 60 * 24));
         const expectedPoints = Math.ceil(averagePointsPerDay * daysPassed);
-        const expectedChapter = currentMode === 'alternative' ? 1 : Math.ceil(expectedPoints / config.POINTS_PER_CHAPTER);
-        const pointsInCurrentExpectedChapter = currentMode === 'alternative' ? expectedPoints : expectedPoints % config.POINTS_PER_CHAPTER;
+        const expectedChapter = Math.ceil(expectedPoints / config.POINTS_PER_CHAPTER);
+        const pointsInCurrentExpectedChapter = expectedPoints % config.POINTS_PER_CHAPTER;
         const expectedStage = Math.ceil(pointsInCurrentExpectedChapter / config.POINTS_PER_STAGE);
         const expectedStagePoints = pointsInCurrentExpectedChapter % config.POINTS_PER_STAGE;
 
-        const globalStageNumber = currentMode === 'alternative' ? stage : ((chapter - 1) * config.STAGES_PER_CHAPTER) + stage;
+        const globalStageNumber = ((chapter - 1) * config.STAGES_PER_CHAPTER) + stage;
         let completedPoints = calculateCompletedPoints(chapter, stage, pointsNumerator, config);
         const remainingPoints = config.TOTAL_POINTS - completedPoints;
         const daysRemaining = Math.ceil((config.END_DATE - today) / (1000 * 60 * 60 * 24));
@@ -151,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function calculateCompletedPoints(chapter, stage, pointsNumerator, config) {
         let points = 0;
-        if (currentMode === 'original' && chapter > 1) {
+        if (chapter > 1) {
             points += config.POINTS_PER_CHAPTER * (chapter - 1);
         }
         points += (stage - 1) * config.POINTS_PER_STAGE;
@@ -163,13 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
         chapter, stage, globalStageNumber, averagePointsPerDay, progressStatus, progressClass,
         expectedChapter, expectedStage, expectedStagePoints, config) {
         
-        const chapterInfo = currentMode === 'alternative' ? 
-            `<p>Поточний етап: <span class="highlight">${stage}</span></p>` :
-            `<p>Поточна глава: <span class="highlight">${chapter}</span>, етап: <span class="highlight">${stage}</span> (загальний етап: ${globalStageNumber})</p>`;
+        const chapterInfo = `<p>Поточна глава: <span class="highlight">${chapter}</span>, етап: <span class="highlight">${stage}</span> (загальний етап: ${globalStageNumber})</p>`;
         
-        const expectedInfo = currentMode === 'alternative' ?
-            `<p>Сьогодні ви повинні бути на: етап <span class="highlight">${expectedStage}</span>, з <span class="highlight">${expectedStagePoints}</span> очками в етапі</p>` :
-            `<p>Сьогодні ви повинні бути на: глава <span class="highlight">${expectedChapter}</span>, етап <span class="highlight">${expectedStage}</span>, з <span class="highlight">${expectedStagePoints}</span> очками в етапі</p>`;
+        const expectedInfo = `<p>Сьогодні ви повинні бути на: глава <span class=\"highlight\">${expectedChapter}</span>, етап <span class=\"highlight\">${expectedStage}</span>, з <span class=\"highlight\">${expectedStagePoints}</span> очками в етапі</p>`;
 
         const resultHTML = `
             <h3>Результати розрахунку:</h3>
@@ -204,9 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function formatResultsForCopy(today, completedPoints, remainingPoints, daysRemaining, 
         pointsPerDay, chapter, stage, progressStatus) {
-        const chapterText = currentMode === 'alternative' ? 
-            `Поточний етап: ${stage}` :
-            `Поточна глава: ${chapter}, етап: ${stage}`;
+        const chapterText = `Поточна глава: ${chapter}, етап: ${stage}`;
 
         return `Результати розрахунку на ${formatDate(today)}:
 
