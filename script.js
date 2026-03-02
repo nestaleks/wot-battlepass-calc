@@ -1,41 +1,35 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mode configurations
     const CONFIG = {
         TOTAL_POINTS: 7500,
         POINTS_PER_STAGE: 50,
         STAGES_PER_CHAPTER: 50,
         POINTS_PER_CHAPTER: 2500,
         CHAPTERS_TOTAL: 3,
-        START_DATE: new Date(2025, 8, 3), // September 3rd, 2025
-        END_DATE: new Date(2025, 10, 25), // November 25th, 2025
-        periodText: "з 3 вересня до 25 листопада",
+        START_DATE: new Date(2026, 2, 4), // March 4th, 2026
+        END_DATE: new Date(2026, 5, 2), // June 2nd, 2026
+        periodText: "з 4 березня до 2 червня",
         descriptionText: "Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.",
         maxChapters: 3
     };
 
-    // Single mode (original) only
 
     const form = document.getElementById('progress-form');
     const resultBlock = document.getElementById('result');
 
-    // Initialize fixed config UI
     updateModeUI();
 
     form.addEventListener('submit', calculateProgress);
-    loadHistory(); // Add this line
+    loadHistory();
 
-    // Removed alternative mode; only single configuration remains
 
     function updateModeUI() {
         const config = getCurrentConfig();
         
-        // Update info texts
         const periodEl = document.getElementById('info-period');
         if (periodEl) periodEl.textContent = config.periodText;
         const descEl = document.getElementById('info-description');
         if (descEl) descEl.textContent = config.descriptionText;
         
-        // Update chapter input
         const chapterInput = document.getElementById('chapter');
         const chapterLabel = document.querySelector('label[for="chapter"]');
         if (chapterInput && chapterLabel) {
@@ -65,7 +59,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const stage = parseInt(document.getElementById('stage').value);
         const pointsNumerator = parseInt(document.getElementById('points-numerator').value);
 
-        // Validate inputs
         const chapterValid = !isNaN(chapter);
         if (!chapterValid || isNaN(stage) || isNaN(pointsNumerator)) {
             showResult('Будь ласка, заповніть всі поля коректно');
@@ -76,13 +69,13 @@ document.addEventListener('DOMContentLoaded', function() {
         today.setHours(0, 0, 0, 0);
 
         if (today < config.START_DATE) {
-            const startDateText = '3 вересня';
+            const startDateText = '4 березня';
             showResult(`Подія ще не почалася. Старт ${startDateText} ${config.START_DATE.getFullYear()} року.`);
             return;
         }
 
         if (today > config.END_DATE) {
-            const endDateText = '25 листопада';
+            const endDateText = '2 червня';
             showResult(`Подія вже завершилася ${endDateText} ${config.END_DATE.getFullYear()} року.`);
             return;
         }
@@ -108,7 +101,6 @@ document.addEventListener('DOMContentLoaded', function() {
             : `Ви відстали від графіку на ${expectedPoints - completedPoints} очок`;
         const progressClass = completedPoints >= expectedPoints ? 'highlight' : 'highlight-warning';
 
-        // Save progress to history after calculations
         saveToHistory(chapter, stage, pointsNumerator, completedPoints);
 
         displayResults(today, completedPoints, remainingPoints, daysRemaining, pointsPerDay, 
@@ -154,7 +146,6 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         showResult(resultHTML);
         
-        // Add copy button handler
         const copyBtn = document.getElementById('copy-btn');
         if (copyBtn) {
             copyBtn.addEventListener('click', () => {
@@ -208,7 +199,6 @@ ${progressStatus}
         const history = JSON.parse(localStorage.getItem('wotBattlePassHistory') || '[]');
         const today = new Date().toISOString().split('T')[0];
 
-        // Prevent multiple entries per day
         const existingEntryIndex = history.findIndex(entry => entry.date === today);
         const entry = {
             date: today,
@@ -224,7 +214,6 @@ ${progressStatus}
             history.push(entry);
         }
 
-        // Sort by date (newest first) and keep only last 5 entries
         const sortedHistory = history
             .sort((a, b) => new Date(b.date) - new Date(a.date))
             .slice(0, 5);
