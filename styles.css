@@ -22,6 +22,60 @@ body {
     align-items: center;
     flex-direction: column;
     padding: 20px;
+    position: relative;
+}
+
+.language-switcher {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.lang-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #6b5b3a;
+    background: rgba(25, 30, 20, 0.9);
+    color: #e8e6d3;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 0;
+}
+
+.lang-btn:hover {
+    border-color: #f0c674;
+    background: rgba(35, 40, 30, 0.95);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.lang-btn.active {
+    border-color: #f0c674;
+    background: rgba(107, 91, 58, 0.8);
+    box-shadow: 0 0 15px rgba(240, 198, 116, 0.3);
+}
+
+.lang-btn::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #8b7355, #6b5b3a, #5a4e35, #6b5b3a);
+    z-index: -1;
+}
+
+.lang-btn:active {
+    transform: translateY(0);
 }
 
 .container {
@@ -375,6 +429,18 @@ button:active {
 }
 
 @media (max-width: 768px) {
+    .language-switcher {
+        top: 10px;
+        right: 10px;
+        gap: 5px;
+    }
+    
+    .lang-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
     .container {
         margin: 10px;
         padding: 20px;

@@ -10,28 +10,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="language-switcher">
+        <button class="lang-btn active" data-lang="uk" title="Українська">
+            🇺🇦
+        </button>
+        <button class="lang-btn" data-lang="en" title="English">
+            🇬🇧
+        </button>
+        <button class="lang-btn" data-lang="ru" title="Русский">
+            🇷🇺
+        </button>
+    </div>
     <div class="container">
-        <h1>Калькулятор прогресу</h1>
-        <h1>Бойова перепустка 18 сезон</h1>
+        <h1 data-translate="calculator-title">Калькулятор прогресу</h1>
+        <h1 data-translate="battlepass-title">Бойова перепустка 18 сезон</h1>
 
         <div class="info-block">
-            <p id="info-period">з 4 березня до 2 червня</p>
-            <p id="info-description">Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.</p>
+            <p id="info-period" data-translate="info-period">з 4 березня до 3 червня</p>
+            <p id="info-description" data-translate="info-description">Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.</p>
         </div>
         
         <form id="progress-form">
             <div class="form-group form-group-chapter">
-                <label for="chapter">Глава (1-3):</label>
+                <label for="chapter" data-translate="chapter-label">Глава (1-3):</label>
                 <input type="number" id="chapter" min="1" max="3" required>
             </div>
             
             <div class="form-group form-group-stage">
-                <label for="stage">Етап (1-50):</label>
+                <label for="stage" data-translate="stage-label">Етап (1-50):</label>
                 <input type="number" id="stage" min="1" max="50" required>
             </div>
             
             <div class="form-group form-group-points">
-                <label for="points-numerator">Кількість очок в етапі:</label>
+                <label for="points-numerator" data-translate="points-label">Кількість очок в етапі:</label>
                 <div class="fraction-input">
                     <input type="number" id="points-numerator" min="0" max="7500" required>
                     <span class="fraction-divider">/</span>
@@ -39,7 +50,7 @@
                 </div>
             </div>
             
-            <button type="submit">Розрахувати</button>
+            <button type="submit" data-translate="calculate-btn">Розрахувати</button>
         </form>
         
         <div id="result" class="result-block"></div>
