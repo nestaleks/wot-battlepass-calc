@@ -3,8 +3,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const translations = {
         uk: {
             'calculator-title': 'Калькулятор прогресу',
-            'battlepass-title': 'Бойова перепустка 18 сезон',
-            'info-period': 'з 4 березня до 3 червня',
+            'battlepass-title': 'Бойова перепустка 20 сезон',
+            'info-period': 'з 3 червня до 2 вересня',
             'info-description': 'Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.',
             'chapter-label': 'Глава (1-3):',
             'stage-label': 'Етап (1-50):',
@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         en: {
             'calculator-title': 'Progress Calculator',
-            'battlepass-title': 'Battle Pass Season 18',
-            'info-period': 'March 4 - June 3',
+            'battlepass-title': 'Battle Pass Season 20',
+            'info-period': 'June 3 - September 2',
             'info-description': 'Enter the chapter you are currently working on, stage and the number of points received in the stage, then click the button.',
             'chapter-label': 'Chapter (1-3):',
             'stage-label': 'Stage (1-50):',
@@ -89,8 +89,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         ru: {
             'calculator-title': 'Калькулятор прогресса',
-            'battlepass-title': 'Боевой пропуск 18 сезон',
-            'info-period': 'с 4 марта по 3 июня',
+            'battlepass-title': 'Боевой пропуск 20 сезон',
+            'info-period': 'с 3 июня по 2 сентября',
             'info-description': 'Укажите главу, которую уже выполняете, этап и количество полученных очков в этапе и нажмите кнопку.',
             'chapter-label': 'Глава (1-3):',
             'stage-label': 'Этап (1-50):',
@@ -154,9 +154,9 @@ document.addEventListener('DOMContentLoaded', function() {
         STAGES_PER_CHAPTER: 50,
         POINTS_PER_CHAPTER: 2500,
         CHAPTERS_TOTAL: 3,
-        START_DATE: createUTC3Date(2026, 2, 4, 0, 0, 0, 0), // March 4th, 2026 (UTC+3)
-        END_DATE: createUTC3Date(2026, 5, 3, 23, 59, 59, 999), // June 3rd, 2026 (UTC+3)
-        periodText: "з 4 березня до 2 червня",
+        START_DATE: createUTC3Date(2026, 5, 3, 0, 0, 0, 0), // June 3rd, 2026 (UTC+3)
+        END_DATE: createUTC3Date(2026, 8, 2, 23, 59, 59, 999), // September 2nd, 2026 (UTC+3)
+        periodText: "з 3 червня до 2 вересня",
         descriptionText: "Вкажіть главу, яку вже виконуєте, етап та кількість отриманих очок в етапі і нажмите кнопку.",
         maxChapters: 3
     };
@@ -194,9 +194,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update date texts
         const dateTexts = {
-            uk: { start: '4 березня', end: '3 червня' },
-            en: { start: 'March 4', end: 'June 3' },
-            ru: { start: '4 марта', end: '3 июня' }
+            uk: { start: '3 червня', end: '2 вересня' },
+            en: { start: 'June 3', end: 'September 2' },
+            ru: { start: '3 июня', end: '2 сентября' }
         };
         CONFIG.startDateText = dateTexts[lang].start;
         CONFIG.endDateText = dateTexts[lang].end;
@@ -266,13 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const today = getUTC3Date(); // Get current date in UTC+3
 
         if (today < config.START_DATE) {
-            const startDateText = config.startDateText || '4 березня';
+            const startDateText = config.startDateText || '3 червня';
             showResult(`${translate('event-not-started')} ${startDateText} ${config.START_DATE.getFullYear()} року.`);
             return;
         }
 
         if (today > config.END_DATE) {
-            const endDateText = config.endDateText || '3 червня';
+            const endDateText = config.endDateText || '2 вересня';
             showResult(`${translate('event-ended')} ${endDateText} ${config.END_DATE.getFullYear()} року.`);
             return;
         }
